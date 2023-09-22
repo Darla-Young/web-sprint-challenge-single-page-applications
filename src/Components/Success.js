@@ -1,6 +1,7 @@
 import React from "react"
 
 export default function Success (props) {
+    const {info} = props
     return (
         <div id="success">
             <p>Success! Pizza is on the way!</p>

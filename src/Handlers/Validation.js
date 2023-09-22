@@ -1,39 +1,33 @@
-import React from "react"
 import * as Yup from 'yup'
 
-export default function validate(item) {
-    const schema = Yup.object().shape({
-        name: Yup
-            .string()
-            .required('Please enter your full name')
-            .min(2, 'name must be at least 2 characters'),
-        size: Yup
-            .string()
-            .required('Please select a size')
-            .oneOf(['sm', 'md', 'lg'], 'Please select a size'),
-        toppings: Yup
-            .object()
-            .required('Please select at least 1 topping')
-            .shape({
-                cheese: Yup
-                    .boolean()
-                    .oneOf([true, false]),
-                pepperoni: Yup
-                    .boolean()
-                    .oneOf([true, false]),
-                mushrooms: Yup
-                    .boolean()
-                    .oneOf([true, false]),
-                pineapple: Yup
-                    .boolean()
-                    .oneOf([true, false]),
-            })
+let schema = Yup.object().shape({
+    name: Yup
+        .string()
+        .required('Please enter your full name')
+        .min(2, 'name must be at least 2 characters'),
+    size: Yup
+        .string()
+        .required('Please select a size')
+        .oneOf(['sm', 'md', 'lg'], 'Please select a size'),
+    cheese: Yup.boolean(),
+    pepperoni: Yup.boolean(),
+    mushrooms: Yup.boolean(),
+    pineapple: Yup.boolean(),
+    special: Yup.string()
+}).test(
+    'mustChooseAtLeastOne',
+    null,
+    (obj) => {
+        if (obj.cheese || obj.pepperoni || obj.mushrooms || obj.pineapple) {
+            return true
+        }
 
-    })
+        return new Yup.ValidationError(
+            'Please choose at least one topping',
+            null,
+            'toppings'
+        )
+    }
+)
 
-    return (
-        <p>
-            {item} error message goes here
-        </p>
-    )
-}
+export default schema
