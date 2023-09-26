@@ -1,71 +1,54 @@
-import React, {useState, useEffect} from 'react'
+import React, {useEffect} from 'react'
 import axios from 'axios'
 import * as Yup from 'yup'
 import schema from '../Handlers/Validation'
-import Success from './Success'
-    
-const blankform = {
-    name: '',
-    size: '',
-    toppings: '',
-    special: ''
-  }
+import {useNavigate} from 'react-router-dom'
 
 export default function Form(props) {
-    const {id} = props
-
-    const [form, setForm] = useState(blankform)
-    const [errors, setErrors] = useState({name: '', size: '', toppings: '', special: ''})
-    const [disabled, setDisabled] = useState(true)
+    const {id,state,setState,errors,setErrors,disabled,setDisabled} = props
+    const navigate = useNavigate()
 
     useEffect(() => {
-        schema.isValid(form)
-            .then(valid => setDisabled(!valid))
-    }, [form])
+        schema.isValid(state)
+            .then((valid) => setDisabled(!valid))
+    }, [state])
 
     const onChange = evt => {
         const {checked, type, name, value, id} = evt.target
-        const useThisValue = type === 'checkbox' ? checked : value
-        const useThisName = name === 'toppings' ? id : name
         let selection = []
-        const thisOne = form.toppings[form.toppings.indexOf(id)]
-        if (type !== 'checkbox') {setForm({...form, [name]: useThisValue})}
+        if(state.toppings.length>0){state.toppings.map(i => {return selection.push(i)})}
+        if (type !== 'checkbox') {setState({...state, [name]: value})}
         else {
-            if(form.toppings.length > 0){
-                for(let i=0; i<form.toppings.length; i++) {selection.push(i)}
-            }
-            if(thisOne) {selection.splice(selection.indexOf(id), 1)}
+            if(!checked) {selection.splice(selection.indexOf(id), 1)}
             else(selection.push(id))
-            setForm({
-                ...form,
+            setState({
+                ...state,
                 toppings: selection
             })
         }
+        const useThisValue = type === 'checkbox' ? selection : value
         Yup
-          .reach(schema, useThisName, name)
+          .reach(schema, name)
           .validate(useThisValue)
           .then((res) => {
-            console.log('Yup response: ' + res)
             setErrors({...errors, [name]: ''})
           })
           .catch(err => {
-            console.log('Yup error: ' + err)
             setErrors({...errors, [name]: err.errors[0]})
-            console.log(errors)
           })
       }
     
       const onSubmit = evt => {
         evt.preventDefault()
         setDisabled(true)
-        const newOrder = {...form, username: form.name.trim()}
+        const newOrder = {...state, name: state.name.trim()}
+        setState(newOrder)
         axios
           .post('https://reqres.in/api/orders', newOrder)
           .then((res) => {
-            setForm(blankform)
-            return <Success info={res} />
+            navigate('/confirmation', {replace: true, state: newOrder})
           })
-          .catch(err => {console.log(err)})
+          .catch(err => {console.log(err.message)})
       }
 
     return (
@@ -79,7 +62,7 @@ export default function Form(props) {
                             id="name-input" 
                             name="name" 
                             type="text" 
-                            value={form.name} 
+                            value={state.name} 
                             placeholder="Full name" 
                         />
                     </label>
@@ -88,7 +71,7 @@ export default function Form(props) {
                 {/* Size dropdown */}
                 <div className="inputGroup">
                     <label>Size:
-                        <select onChange={onChange} id="size-dropdown" value={form.size} name="size">
+                        <select onChange={onChange} id="size-dropdown" value={state.size} name="size">
                             <option value="">-- Select Size --</option>
                             <option value="sm">Small</option>
                             <option value="md">Medium</option>
@@ -104,7 +87,7 @@ export default function Form(props) {
                             <input 
                                 onChange={onChange} 
                                 id="cheese" 
-                                checked={form.toppings?.cheese} 
+                                checked={state.toppings?.cheese} 
                                 type="checkbox" 
                                 name="toppings" 
                             />
@@ -113,7 +96,7 @@ export default function Form(props) {
                             <input 
                                 onChange={onChange} 
                                 id="pepperoni" 
-                                checked={form.toppings?.pepperoni} 
+                                checked={state.toppings?.pepperoni} 
                                 type="checkbox" 
                                 name="toppings" 
                             />
@@ -122,7 +105,7 @@ export default function Form(props) {
                             <input 
                                 onChange={onChange} 
                                 id="mushrooms" 
-                                checked={form.toppings?.mushrooms} 
+                                checked={state.toppings?.mushrooms} 
                                 type="checkbox" 
                                 name="toppings" 
                             />
@@ -131,7 +114,7 @@ export default function Form(props) {
                             <input 
                                 onChange={onChange} 
                                 id="pineapple" 
-                                checked={form.toppings?.pineapple} 
+                                checked={state.toppings?.pineapple} 
                                 type="checkbox" 
                                 name="toppings" 
                             />
@@ -147,7 +130,7 @@ export default function Form(props) {
                             id="special-text" 
                             name="special" 
                             type="text" 
-                            value={form.special} 
+                            value={state.special} 
                             placeholder="Helpful instructions or unusual requests go here." 
                         />
                     </label>

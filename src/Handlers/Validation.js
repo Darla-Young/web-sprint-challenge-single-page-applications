@@ -9,25 +9,11 @@ let schema = Yup.object().shape({
         .string()
         .required('Please select a size')
         .oneOf(['sm', 'md', 'lg'], 'Please select a size'),
-    cheese: Yup.boolean(),
-    pepperoni: Yup.boolean(),
-    mushrooms: Yup.boolean(),
-    pineapple: Yup.boolean(),
+    toppings: Yup
+        .array()
+        .min(1, 'Please choose at least one topping')
+        .required('Please choose at least one topping'),
     special: Yup.string()
-}).test(
-    'mustChooseAtLeastOne',
-    null,
-    (obj) => {
-        if (obj.cheese || obj.pepperoni || obj.mushrooms || obj.pineapple) {
-            return true
-        }
-
-        return new Yup.ValidationError(
-            'Please choose at least one topping',
-            null,
-            'toppings'
-        )
-    }
-)
+})
 
 export default schema
