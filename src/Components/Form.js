@@ -34,6 +34,8 @@ export default function Form(props) {
             setErrors({...errors, [name]: ''})
           })
           .catch(err => {
+            console.log(err.errors[0])
+            console.log(errors)
             setErrors({...errors, [name]: err.errors[0]})
           })
       }
@@ -66,7 +68,7 @@ export default function Form(props) {
                             placeholder="Full name" 
                         />
                     </label>
-                    {/* <div className='errors' value={message('name')} /> */}
+                    <p className='errors'>{errors.name}</p>
                 </div>
                 {/* Size dropdown */}
                 <div className="inputGroup">
@@ -78,7 +80,7 @@ export default function Form(props) {
                             <option value="lg">Large</option>
                         </select>
                     </label>
-                    {/* <div className='errors' value={message('size')} /> */}
+                    <p className='errors'>{errors.size}</p>
                 </div>
                 {/* Toppings checklist */}
                 <div className="inputGroup">
@@ -120,7 +122,7 @@ export default function Form(props) {
                             />
                         </label>
                     </label>
-                    {/* <div className='errors' value={message('toppings')} /> */}
+                    <p className='errors'>{errors.toppings}</p>
                 </div>
                 {/* Instructions field */}
                 <div className="inputGroup">
@@ -134,7 +136,7 @@ export default function Form(props) {
                             placeholder="Helpful instructions or unusual requests go here." 
                         />
                     </label>
-                    {/* <div className='errors' value={message('special')} /> */}
+                    <p className='errors'>{errors.special}</p>
                 </div>
                 {/* Submit */}
                 <div>
